@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grid Layout with Icons</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfHAqdYogJzOI1zIwfv9rZCRap3kWZtEFD4n1Ka-XYlc08SqmeQLlMwAy3&s=10');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+        }
+        .sidebar {
+            width: 220px;
+            background-color: rgba(26, 26, 26, 0.9);
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+            position: fixed;
+            height: 100%;
+            z-index: 1;
+            overflow-y: auto;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .logo img {
+            width: 100px;
+            height: auto;
+        }
+        .sidebar button {
+            display: flex;
+            align-items: center;
+            color: #ccc;
+            background: none;
+            border: none;
+            padding: 15px 20px;
+            font-size: 1.1em;
+            transition: background 0.3s, transform 0.3s;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .sidebar button:before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300%;
+            height: 300%;
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.5s ease;
+            border-radius: 50%;
+        }
+        .sidebar button:hover:before {
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .sidebar button:hover, .sidebar button.active {
+            background-color: #333;
+            color: #ff0000;
+            transform: translateX(5px);
+        }
+        .sidebar button i {
+            margin-right: 10px;
+        }
+        .content {
+            margin-left: 240px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            flex: 1;
+        }
+        .grid-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        .large-card, .small-card {
+            background-color: #222;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s;
+        }
+        .large-card {
+            grid-column: span 2;
+        }
+        .small-card {
+            height: 100px;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+        }
+        .section-title {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #ffc107;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .carousel {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+        .carousel::-webkit-scrollbar {
+            display: none;
+        }
+        .carousel-item {
+            flex: none;
+            width: 120px;
+            height: 180px;
+            margin-right: 15px;
+            scroll-snap-align: start;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        .carousel-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .view-more {
+            background-color: #ffc107;
+            color: #000;
+            padding: 5px 10px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .view-more:hover {
+            background-color: #e0a800;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <img src="https://i.ibb.co/zR3Z17Q/Grey-minimalist-business-project-presentation-20241109-131507-0000-removebg-preview.png" alt="Logo">
+        </div>
+        <button class="active" onclick="navigateTo(this, 'inicio.html')"><i class="fas fa-home"></i>INICIO</button>
+        <button onclick="navigateTo(this, 'canales.html')"><i class="fas fa-tv"></i>CANALES</button>
+        <button onclick="navigateTo(this, 'buscador.html')"><i class="fas fa-search"></i>BUSCADOR</button>
+        <button onclick="navigateTo(this, 'juegos.html')"><i class="fas fa-play"></i>JUEGOS</button>
+        <button onclick="navigateTo(this, 'mangas.html')"><i class="fas fa-dragon"></i>MANGAS</button>
+        <button onclick="navigateTo(this, 'perfil.html')"><i class="fas fa-user-cog"></i>PERFIL</button>
+    </div>
+    <div class="content">
+        <div class="grid-section">
+            <a href="https://example.com/page1" class="large-card card">
+                <img src="https://imgsrv.crunchyroll.com/cdn-cgi/image/fit=contain,format=auto,quality=85,width=400,height=200/catalog/crunchyroll/a249096c7812deb8c3c2c907173f3774.jpg" alt="Imagen 1">
+            </a>
+            <a href="https://example.com/page2" class="large-card card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgMRU1qXrtQq34w2S44fScfqzMOtYrRmO2vTF_9b2ocY8qWjowpbQtgLJB&s=10" alt="Imagen 2">
+            </a>
+            <a href="https://example.com/page3" class="small-card card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9EJcxsCl6kl-o_usnrCfsZtMqVfIykhScOA&usqp=CAU" alt="Imagen 3">
+            </a>
+            <a href="https://example.com/page4" class="small-card card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsfnS0NY10z9_wQLrt9jwTxL3QHEWpj6h8Mg&usqp=CAU" alt="Imagen 4">
+            </a>
+            <a href="https://example.com/page5" class="small-card card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTBz7rPQyUjUG643LKmUiqimByupYurHLlarg&usqp=CAU" alt="Imagen 5">
+            </a>
+            <a href="https://example.com/page6" class="small-card card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5c5OZ6GQXBlwb3OZ1-UXT6rWevL15yjQl1g&usqp=CAU" alt="Imagen 6">
+            </a>
+        </div>
+        <div class="section">
+            <div class="section-title">
+                Estrenos
+                <a href="https://example.com/more" class="view-more">Ver más</a>
+            </div>
+            <div class="carousel">
+                <a href="https://example.com/estreno1" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.jNlVBaqk3zH5fMWN8f7KxAHaLV?rs=1&pid=ImgDetMain" alt="Estreno 1">
+                </a>
+                <a href="https://example.com/estreno2" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.CHdLG94ElPPc9g4djutKpwHaLH?rs=1&pid=ImgDetMain" alt="Estreno 2">
+                </a>
+                <a href="https://example.com/estreno3" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.qHpHwgv2i6kEUF6mTXJLWgAAAA?w=345&h=500&rs=1&pid=ImgDetMain" alt="Estreno 3">
+                </a>
+                <a href="https://example.com/estreno4" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.1BlEorg6DTr9sj5q5jwMKwHaJQ?rs=1&pid=ImgDetMain" alt="Estreno 4">
+                </a>
+                <a href="https://example.com/estreno5" class="carousel-item">
+                    <img src="https://sportshub.cbsistatic.com/i/2023/12/13/9668ea65-19bf-4953-a416-3e0b7cc8c5e9/kung-fu-panda-4-poster.jpg?auto=webp&width=1200&height=1500&crop=0.8:1,smart" alt="Estreno 5">
+                </a>
+                <a href="https://example.com/estreno6" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/R.368647ea011075901658e9f0af34bc86?rik=KJogWX69pxHccA&riu=http%3a%2f%2fwww.impawards.com%2fintl%2fspain%2f2019%2fposters%2fel_hoyo_ver2_xlg.jpg&ehk=PZ36SWwFn0P6AMFx4ZrtF0JpeC0IcQX3%2fc%2fv0T1h4bo%3d&risl=&pid=ImgRaw&r=0" alt="Estreno 6">
+                </a>
+            </div>
+        </div>
+    </div>
+    <script>
+        function navigateTo(button, url) {
+            // Remover la clase 'active' de todos los botones
+            const buttons = document.querySelectorAll('.sidebar button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Añadir la clase 'active' al botón clicado
+            button.classList.add('active');
+            
+            // Redirigir a la URL del botón
+            window.location.href = url;
+        }
+    </script>
+</body>
+</html>
