@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CINE LAT</title>
+    <title>Grid Layout with Icons</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body {
@@ -137,11 +137,17 @@
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s; /* Agregada transición para la animación */
         }
         .carousel-item img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transition: transform 0.3s ease, filter 0.3s ease; /* Agrega transición */
+        }
+        .carousel-item:hover img {
+            transform: scale(1.1); /* Escala la imagen al pasar el mouse */
+            filter: brightness(1.1); /* Aumenta el brillo de la imagen */
         }
         .view-more {
             background-color: #ffc107;
@@ -213,6 +219,136 @@
                 </a>
                 <a href="https://example.com/estreno6" class="carousel-item">
                     <img src="https://th.bing.com/th/id/R.368647ea011075901658e9f0af34bc86?rik=KJogWX69pxHccA&riu=http%3a%2f%2fwww.impawards.com%2fintl%2fspain%2f2019%2fposters%2fel_hoyo_ver2_xlg.jpg&ehk=PZ36SWwFn0P6AMFx4ZrtF0JpeC0IcQX3%2fc%2fv0T1h4bo%3d&risl=&pid=ImgRaw&r=0" alt="Estreno 6">
+                </a>
+            </div>
+        </div>
+        <div class="section">
+            <div class="section-title">
+                Películas Más Vistas de Este Año
+                <a href="https://example.com/more" class="view-more">Ver más</a>
+            </div>
+            <div class="carousel">
+                <a href="https://example.com/pelicula1" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.W2m4N0KQ1fl4t5v7xk2Z2gHaLH?pid=ImgDet&w=300&h=450" alt="Película 1">
+                </a>
+                <a href="https://example.com/pelicula2" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.xK6e7bM_M5DHe9kV9wD2pQHaLH?pid=ImgDet&w=300&h=450" alt="Película 2">
+                </a>
+                <a href="https://example.com/pelicula3" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.M2TzJ9r9ZbJxQ4tIj6uEJgHaLH?pid=ImgDet&w=300&h=450" alt="Película 3">
+                </a>
+                <a href="https://example.com/pelicula4" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.B6p1D1UG4g2cAgu9kB9A8AHaLH?pid=ImgDet&w=300&h=450" alt="Película 4">
+                </a>
+                <a href="https://example.com/pelicula5" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.OzU7JqU1_LXU1fC0S6G7pAHaLH?pid=ImgDet&w=300&h=450" alt="Película 5">
+                </a>
+                <a href="https://example.com/pelicula6" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.PAaztR9h4oFZ3WzF1qWk_QHaLH?pid=ImgDet&w=300&h=450" alt="Película 6">
+                </a>
+            </div>
+        </div>
+        <div class="section">
+            <div class="section-title">
+                Animes
+                <a href="https://example.com/more" class="view-more">Ver más</a>
+            </div>
+            <div class="carousel">
+                <a href="https://example.com/anime1" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.1m3pD3uZ6GmbYX1lktm1mAHaLH?pid=ImgDet&w=300&h=450" alt="Anime 1">
+                </a>
+                <a href="https://example.com/anime2" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.3qZ6q5F5yHyhC6Ubg3C2yAHaLH?pid=ImgDet&w=300&h=450" alt="Anime 2">
+                </a>
+                <a href="https://example.com/anime3" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.4g9V9O8gC1nJZbikSwA2NwHaLH?pid=ImgDet&w=300&h=450" alt="Anime 3">
+                </a>
+                <a href="https://example.com/anime4" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.5zW5C1F6Xw56yFOC4m3yKgHaLH?pid=ImgDet&w=300&h=450" alt="Anime 4">
+                </a>
+                <a href="https://example.com/anime5" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.6m7Z7Jv3F2hFfQp3iI4W8gHaLH?pid=ImgDet&w=300&h=450" alt="Anime 5">
+                </a>
+                <a href="https://example.com/anime6" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.7n8Y8R9gD9fZ3V7lH6g2vAHaLH?pid=ImgDet&w=300&h=450" alt="Anime 6">
+                </a>
+            </div>
+        </div>
+        <div class="section">
+            <div class="section-title">
+                Doramas
+                <a href="https://example.com/more" class="view-more">Ver más</a>
+            </div>
+            <div class="carousel">
+                <a href="https://example.com/dorama1" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.8m9j7GZkC0T1xUIf4bC1QgHaLH?pid=ImgDet&w=300&h=450" alt="Doramas 1">
+                </a>
+                <a href="https://example.com/dorama2" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.9n0Q0mQs3K8D9Jx3V6u9nAHaLH?pid=ImgDet&w=300&h=450" alt="Doramas 2">
+                </a>
+                <a href="https://example.com/dorama3" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.AA7Z0zD0-8gQhXt8cR2wGgHaLH?pid=ImgDet&w=300&h=450" alt="Doramas 3">
+                </a>
+                <a href="https://example.com/dorama4" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.BAcX8o8xvO9d9EJxFiZ6HAHaLH?pid=ImgDet&w=300&h=450" alt="Doramas 4">
+                </a>
+                <a href="https://example.com/dorama5" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.CBfR9N5v0yf2Qz6zN0W-4gHaLH?pid=ImgDet&w=300&h=450" alt="Doramas 5">
+                </a>
+                <a href="https://example.com/dorama6" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.DF8n1rH5V3m9k4IzM4wN0gHaLH?pid=ImgDet&w=300&h=450" alt="Doramas 6">
+                </a>
+            </div>
+        </div>
+        <div class="section">
+            <div class="section-title">
+                Animados
+                <a href="https://example.com/more" class="view-more">Ver más</a>
+            </div>
+            <div class="carousel">
+                <a href="https://example.com/animado1" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.E2c8h0S3UxU_7Hb7PZ0oNgHaLH?pid=ImgDet&w=300&h=450" alt="Animado 1">
+                </a>
+                <a href="https://example.com/animado2" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.FG7H4Fo6M2YdW1q1Ed7N8gHaLH?pid=ImgDet&w=300&h=450" alt="Animado 2">
+                </a>
+                <a href="https://example.com/animado3" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.GH8F9g1N0t6X7Xg1yP1F3AHaLH?pid=ImgDet&w=300&h=450" alt="Animado 3">
+                </a>
+                <a href="https://example.com/animado4" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.HJ7L3A3aF2K6t7dA3F2MZgHaLH?pid=ImgDet&w=300&h=450" alt="Animado 4">
+                </a>
+                <a href="https://example.com/animado5" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.IK9F8g8v0T9j0U1RjK6Q5AHaLH?pid=ImgDet&w=300&h=450" alt="Animado 5">
+                </a>
+                <a href="https://example.com/animado6" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.JK8M6nG1K9U3yK5Y2F2I6wHaLH?pid=ImgDet&w=300&h=450" alt="Animado 6">
+                </a>
+            </div>
+        </div>
+        <div class="section">
+            <div class="section-title">
+                Terror
+                <a href="https://example.com/more" class="view-more">Ver más</a>
+            </div>
+            <div class="carousel">
+                <a href="https://example.com/terror1" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.MH7pZ6bL7R3KwVab4G1cOgHaLH?pid=ImgDet&w=300&h=450" alt="Terror 1">
+                </a>
+                <a href="https://example.com/terror2" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.MV9GZ5-VG4pR9R0rV9mE8wHaLH?pid=ImgDet&w=300&h=450" alt="Terror 2">
+                </a>
+                <a href="https://example.com/terror3" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.NR0pC4bU8F9kq03GQ4G8SgHaLH?pid=ImgDet&w=300&h=450" alt="Terror 3">
+                </a>
+                <a href="https://example.com/terror4" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.OS0F4T9V5F3XGg5H4x3v0wHaLH?pid=ImgDet&w=300&h=450" alt="Terror 4">
+                </a>
+                <a href="https://example.com/terror5" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.PV0gS7D2Q3GqX4j8F6EA9gHaLH?pid=ImgDet&w=300&h=450" alt="Terror 5">
+                </a>
+                <a href="https://example.com/terror6" class="carousel-item">
+                    <img src="https://th.bing.com/th/id/OIP.QK3M5nT5C0F5O8K6g5A8XgHaLH?pid=ImgDet&w=300&h=450" alt="Terror 6">
                 </a>
             </div>
         </div>
