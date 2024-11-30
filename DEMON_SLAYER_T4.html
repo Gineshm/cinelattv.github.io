@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reproductor de Video</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbQyNBtbXucsQrEtWyXGjbHdPhMDsO8M3Wu0UxYNS1g5Gu4tBnip9ekPw&s=10') no-repeat center center fixed;
+            background-size: cover;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .content {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .video-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            flex: 1;
+            max-width: 320px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .video-container iframe {
+            width: 100%;
+            height: 210px;
+            border: none;
+            border-radius: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .details {
+            flex: 1;
+            text-align: left;
+        }
+
+        .title {
+            font-size: 36px;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 900;
+            color: #ffffff;
+            margin: 10px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        .rating {
+            font-size: 24px;
+            color: gold;
+            margin-bottom: 10px;
+        }
+
+        .synopsis, .release-date, .season, .episodes {
+            margin: 10px 0;
+            font-size: 16px;
+            color: #ffffff;
+        }
+
+        .chapter-list {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .chapter-item {
+            background-color: transparent;
+            border: 2px solid #ffffff;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 0;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: background-color 0.3s, transform 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        .chapter-item:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .full-screen-btn, .download-btn {
+            display: inline-block;
+            background-color: transparent;
+            color: white;
+            padding: 10px 15px;
+            border: 2px solid #ffffff;
+            border-radius: 0;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            text-align: center;
+            margin-top: 10px;
+            margin-right: 10px; /* Espacio entre los botones */
+        }
+
+        .full-screen-btn:hover, .download-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .triangle {
+            display: none; /* Ocultar el triángulo inicialmente */
+            width: 35px; /* Ajusta el tamaño según sea necesario */
+            height: 35px; /* Ajusta el tamaño según sea necesario */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <div class="details">
+                <div class="title">DEMON SLAYER</div>
+                <div class="rating">⭐ 8.5</div>
+                <div class="release-date"><strong>Fecha de Estreno:</strong> 12 de mayo de 2024</div>
+                <div class="season"><strong>Temporada:</strong> 4</div>
+                <div class="episodes"><strong>Capítulos:</strong> 8</div>
+                <div class="synopsis"><strong>Sinopsis:</strong> El temido Muzan perdió a dos de sus súbditos más fuertes, pero ahora tiene un nuevo objetivo: absorber a Nezuko para adquirir su tolerancia a la luz solar y convertirse en el ser perfecto al sobrevivir al día siendo el demonio más poderoso.</div>
+            </div>
+            <div class="video-container">
+                <iframe id="videoPlayer" src="https://unlimplay.com/embed/?NzRncjJmdEtPWWIwREdVckpPbFBrTFpmT2t2YmVPSCtweEtXRDNQK3JXSnZMV2Y3bnl3TzNhL3JSeGJKYkFGSW5OQytEdzVzcFo1YkJQdUhMWFczUk1QQnNMazlJMXAvTEs0NGFmUnBDVllMdzE1SmVId3F5NlQrUTJiZXE5MzE," allowfullscreen></iframe>
+                <div style="display: flex; align-items: center; margin-top: 10px;">
+                    <div class="full-screen-btn" onclick="toggleFullScreen()"><i class="fas fa-expand"></i> Pantalla Completa</div>
+                    <a href="https://unlimplay.com/download/?NzRncjJmdEtPWWIwREdVckpPbFBrTFpmT2t2YmVPSCtweEtXRDNQK3JXSnZMV2Y3bnl3TzNhL3JSeGJKYkFGSW5OQytEdzVzcFo1YkJQdUhMWFczUk1QQnNMazlJMXAvTEs0NGFmUnBDVllMdzE1SmVId3F5NlQrUTJiZXE5MzE," class="download-btn" download>DESCARGAR</a> <!-- Reemplaza con la URL de descarga -->
+                </div>
+            </div>
+        </div>
+
+        <div class="chapter-list">
+            <div class="chapter-item" onclick="changeVideo('video1', this, 1)">1<img class="triangle" id="triangle-1" src="https://images.emojiterra.com/openmoji/v15.0/1024px/25b6.png" alt="Triángulo" style="display: inline;"></div>
+            <div class="chapter-item" onclick="changeVideo('video2', this, 2)">2<img class="triangle" id="triangle-2" src="https://images.emojiterra.com/openmoji/v15.0/1024px/25b6.png" alt="Triángulo"></div>
+            <div class="chapter-item" onclick="changeVideo('video3', this, 3)">3<img class="triangle" id="triangle-3" src="https://images.emojiterra.com/openmoji/v15.0/1024px/25b6.png" alt="Triángulo"></div>
+            <div class="chapter-item" onclick="changeVideo('video4', this, 4)">4<img class="triangle" id="triangle-4" src="https://images.emojiterra.com/openmoji/v15.0/1024px/25b6.png" alt="Triángulo"></div>
+            <div class="chapter-item" onclick="changeVideo('video5', this, 5)">5<img class="triangle" id="triangle-5" src="https://images.emojiterra.com/openmoji/v15.0/1024px/25b6.png" alt="Triángulo"></div>
+            <div class="chapter-item" onclick="changeVideo('video6', this, 6)">6<img class="triangle" id="triangle-6" src="https://images.emojiterra.com/openmoji/v15.0/1024px/25b6.png" alt="Triángulo"></div>
+            <div class="chapter-item" onclick="changeVideo('video7', this, 7)">7<img class="triangle" id="triangle-7" src="https://images.emojiterra.com/openmoji/v15.0/1024px/25b6.png" alt="Triángulo"></div>
+            <div class="chapter-item" onclick="changeVideo('video8', this, 8)">8<img class="triangle" id="triangle-8" src="https://images.emojiterra.com/openmoji/v15.0/1024px/25b6.png" alt="Triángulo"></div>
+        </div>
+
+        <footer></footer>
+    </div>
+
+    <script>
+        function changeVideo(videoId, chapterItem, chapter) {
+            const player = document.getElementById('videoPlayer');
+            
+            // Define las URLs para cada video
+            const videoUrls = {
+                video1: 'https://unlimplay.com/embed/?NzRncjJmdEtPWWIwREdVckpPbFBrTFpmT2t2YmVPSCtweEtXRDNQK3JXSnZMV2Y3bnl3TzNhL3JSeGJKYkFGSW5OQytEdzVzcFo1YkJQdUhMWFczUk1QQnNMazlJMXAvTEs0NGFmUnBDVllMdzE1SmVId3F5NlQrUTJiZXE5MzE,', // URL del video 1
+                video2: 'https://unlimplay.com/embed/?bFN2NWFzbUcxNGpwd2JUTjJFdzNyMGJQQXVYSnRGZ2pmZWhoYlN2SUVpY0VZVlFabENOelFjUUR0cTRuYkRUdkZWM2RaeE1BajFXb2hNanBIWENZL1hLL0xZWG5zNjVObjAwTlpiT0paU0sza2J3QUVmNjhXU0w3QUdaRi9SbHI,', // URL del video 2
+                video3: 'https://unlimplay.com/embed/?L0FZa1RXbzVTWm9mWlY3TVoyZmNJN3haS28rd1BLRmVXRWVFQThaU0oySExsaXVYdXVpOHAwb09LbVUxSVVXK2tkelE3VU5OcHhzR3U0Qk11STRDakVVeUIvcjRudmxrTURyTDQrNXVGeGNBaXdGTEM4SzFqa0k3R0VodEpWbXA,', // URL del video 3
+                video4: 'https://unlimplay.com/embed/?UlhlTUtxanpEeFptaVFscHppYkFQMHA1dE9LNkhUUi9GZWZPSTlBT1dROWQvckpxYWtzb1VmdjIrbWpRNWsvZFlXL25HN2xwTVB0ZlBSWVdCVFFSampGb3RjQ0Q5STdlRDZOeEU1Q0dSdFVUSWNGMFNidFlmNDJTbmFWVE56T2k,', // URL del video 4
+                video5: 'https://unlimplay.com/embed/?SVNtSXNBenVVWTcxcVE5UmkrZTdPMmFyelh4ZEJpZmJka21HWGxsSGM0eDcyZld5RlhsNUhybytubUlDYmQ1bXF1MkJnbFdWMjdZT1BiaUZDZSs4VVk2L3JyZHNId2swNDVXYmU4d2d2NVQxL1o3d0x2dkZibzVNT2VOVVc3bkM,', // URL del video 5
+                video6: 'https://unlimplay.com/embed/?aXJ4MG5paFFUekVCMkxvU0kwR2R0SVR5OEMreEhUaFF4dS9nWnNXUE5leHQ5YTRPL3R0QkIvdUpvS0pIOW1CaGV1cFBUazZVazg3V3ZOdnRRaXp5SmdFV0REdHI4V2FIMGhmb3E5SHV0dVRnVXlWNS9VS0U4NEtsMUsvZi95c1U,', // URL del video 6
+                video7: 'https://unlimplay.com/embed/?Zy9uNFRZZG9lT1QrR3p4TExmdFIvMFVjMlhhWS9RNWFmL2ZhYmF5WGt5bENVUCtyM3B5dDlxcEhhV0NBblQ0QVpvMXBoWHJiT1VQcG5oSWlZZ1VvekVrMVI5VVV2UEJSWlhrNGMzOFZ3RU9zblM3dVg1aTVRN2ZNcVI1d0VkTzI,', // URL del video 7
+                video8: 'https://unlimplay.com/embed/?RmRzdFBOdlJBV1pyL3ptZmE1Q0RSZnpUK2MvTmw4SUVRWHRwNmNweURiZVI0Qjd1bnphR29KQ3VtN3M3ZVo1eVVzaVJueUd3bDd4c3ZFamNPSm4rQmpIZVZRYi9lNG4xVVIrZDNOTGgxWExCYS9OYlV6WnZyVjhsNzZQWTZyd1U,'  // URL del video 8
+            };
+            
+            // Cambia el src del iframe según el videoId
+            player.src = videoUrls[videoId]; 
+
+            // Ocultar todos los triángulos
+            const triangles = document.querySelectorAll('.triangle');
+            triangles.forEach(triangle => triangle.style.display = 'none');
+
+            // Mostrar el triángulo correspondiente
+            const triangle = document.getElementById(`triangle-${chapter}`);
+            triangle.style.display = 'inline'; // Mostrar el triángulo
+        }
+
+        function toggleFullScreen() {
+            const player = document.getElementById('videoPlayer');
+            if (player.requestFullscreen) {
+                player.requestFullscreen();
+            } else if (player.webkitRequestFullscreen) {
+                player.webkitRequestFullscreen();
+            } else if (player.msRequestFullscreen) {
+                player.msRequestFullscreen();
+            }
+        }
+    </script>
+</body>
+</html>
