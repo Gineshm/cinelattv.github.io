@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flus Plus</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTQ8etjNwU1-ycgGJsqQNEWGrawUC_VlkM90w&s') no-repeat center center fixed;
+            background-size: cover;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .content {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .video-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            flex: 1;
+            max-width: 450px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .video-container iframe {
+            width: 100%;
+            height: 210px;
+            border: none;
+            border-radius: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .details {
+            flex: 1;
+            text-align: left;
+        }
+
+        .title {
+            font-size: 36px;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 900;
+            color: #ffffff;
+            margin: 10px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        .rating {
+            font-size: 24px;
+            color: gold;
+            margin-bottom: 10px;
+        }
+
+        .synopsis, .release-date, .season, .episodes {
+            margin: 10px 0;
+            font-size: 16px;
+            color: #ffffff;
+        }
+
+        .chapter-list {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .chapter-item {
+            background-color: transparent;
+            border: 2px solid #ffffff;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 0;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: background-color 0.3s, transform 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        .chapter-item:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .full-screen-btn, .download-btn {
+            display: inline-block;
+            background-color: transparent;
+            color: white;
+            padding: 10px 15px;
+            border: 2px solid #ffffff;
+            border-radius: 0;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            text-align: center;
+            margin-top: 10px;
+            margin-right: 10px; /* Espacio entre los botones */
+        }
+
+        .full-screen-btn:hover, .download-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .triangle {
+            display: none; /* Ocultar el triángulo inicialmente */
+            width: 35px; /* Ajusta el tamaño según sea necesario */
+            height: 35px; /* Ajusta el tamaño según sea necesario */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <div class="details">
+                <div class="title">BLUE LOCK: EPISODE NAGI</div>
+                <div class="rating">⭐ 8.5</div>
+                <div class="release-date"><strong>Fecha de Estreno:</strong> 17 de octubre de 2024</div>
+                <div class="season"><strong>Temporada:</strong> 1</div>
+                <div class="episodes"><strong>Capítulos:</strong> PELICULA</div>
+                <div class="synopsis"><strong>Sinopsis:</strong> La vida tranquila de Seishirō Nagi, un estudiante de segundo año de preparatoria, se tambalea cuando Reo Mikage, un joven ambicioso con todo a su favor, irrumpe en su mundo. Reo no solo es rico y carismático, sino que también tiene un único sueño: convertirse en el mejor futbolista del mundo. Pero para lograrlo, necesita algo que no puede comprar... el talento innato de Nagi. Sin saberlo, Nagi es un prodigio del fútbol, capaz de realizar hazañas imposibles con la mayor indiferencia. Fascinado por su potencial, Reo arrastra a Nagi al despiadado club de fútbol, donde ambos brillarán... y caerán en la mira del implacable y competitivo programa Blue Lock, un campo de batalla donde solo los mejores atacantes sobreviven. ¿Podrá el lazo entre ellos resistir la presión o sucumbirán en la obsesión de alcanzar la gloria?</div>
+            </div>
+            <div class="video-container">
+                <iframe id="videoPlayer" src="https://unlimplay.com/embed/?WGd6WnBqTmVkYXkrMExDaUUyWDAzelVjRldDREQxZzFrSE5zOXJheTZGZEFoVGNnSTlYWUVCbUxJU1hUeEZxT2FvMnFCUnhUcmJyWUF3Qmw5ZjBKSWRJSk1FOVZ5RHhKUHo1NnN4QjFFZjNWc0RhTUtVWlJsWUM3UnQ3UHFzeXc," allowfullscreen></iframe>
+                <div style="display: flex; align-items: center; margin-top: 10px;">
+                    <div class="full-screen-btn" onclick="toggleFullScreen()"><i class="fas fa-expand"></i> Pantalla Completa</div>
+                    <a href="https://unlimplay.com/download/?WGd6WnBqTmVkYXkrMExDaUUyWDAzelVjRldDREQxZzFrSE5zOXJheTZGZEFoVGNnSTlYWUVCbUxJU1hUeEZxT2FvMnFCUnhUcmJyWUF3Qmw5ZjBKSWRJSk1FOVZ5RHhKUHo1NnN4QjFFZjNWc0RhTUtVWlJsWUM3UnQ3UHFzeXc," class="download-btn" download>DESCARGAR</a> <!-- Reemplaza con la URL de descarga -->
+                </div>
+            </div>
+        </div>
+
+        <div class="chapter-list">
+            <div class="chapter-item" onclick="changeVideo('video1', this, 1)">1<img class="triangle" id="triangle-1" src="https://images.emojiterra.com/openmoji/v15.0/1024px/25b6.png" alt="Triángulo" style="display: inline;"></div>
+
+        </div>
+
+        <footer></footer>
+    </div>
+
+    <script>
+        function changeVideo(videoId, chapterItem, chapter) {
+            const player = document.getElementById('videoPlayer');
+            
+            // Define las URLs para cada video
+            const videoUrls = {
+                video1: 'https://unlimplay.com/embed/?WGd6WnBqTmVkYXkrMExDaUUyWDAzelVjRldDREQxZzFrSE5zOXJheTZGZEFoVGNnSTlYWUVCbUxJU1hUeEZxT2FvMnFCUnhUcmJyWUF3Qmw5ZjBKSWRJSk1FOVZ5RHhKUHo1NnN4QjFFZjNWc0RhTUtVWlJsWUM3UnQ3UHFzeXc,', // URL del video 1
+            };
+            
+            // Cambia el src del iframe según el videoId
+            player.src = videoUrls[videoId]; 
+
+            // Ocultar todos los triángulos
+            const triangles = document.querySelectorAll('.triangle');
+            triangles.forEach(triangle => triangle.style.display = 'none');
+
+            // Mostrar el triángulo correspondiente
+            const triangle = document.getElementById(`triangle-${chapter}`);
+            triangle.style.display = 'inline'; // Mostrar el triángulo
+        }
+
+        function toggleFullScreen() {
+            const player = document.getElementById('videoPlayer');
+            if (player.requestFullscreen) {
+                player.requestFullscreen();
+            } else if (player.webkitRequestFullscreen) {
+                player.webkitRequestFullscreen();
+            } else if (player.msRequestFullscreen) {
+                player.msRequestFullscreen();
+            }
+        }
+    </script>
+</body>
+</html>
