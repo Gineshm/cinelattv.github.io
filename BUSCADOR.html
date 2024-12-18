@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscador de Películas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #222;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+        }
+        .search-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .search-container button {
+            padding: 10px;
+            border: none;
+            background-color: #e50914;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 5px;
+            transition: background-color 0.3s;
+        }
+        .search-container button:hover {
+            background-color: #c50712;
+        }
+        .search-container input {
+            width: 100%;
+            max-width: 300px;
+            padding: 10px;
+            border: 2px solid #e50914;
+            border-radius: 5px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .search-container input:focus {
+            border-color: #fff;
+        }
+        .movie-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .movie {
+            width: 120px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s, transform 0.5s;
+        }
+        .movie.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .movie img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .movie img:hover {
+            transform: scale(1.05) translateY(-5px);
+        }
+        .spinner {
+            display: none;
+            margin: 20px auto;
+            text-align: center;
+        }
+        .no-results {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="search-container">
+    <input type="text" id="searchInput" placeholder="Buscar películas o series..." />
+    <button id="searchButton"><i class="fas fa-search"></i></button>
+</div>
+
+<div class="spinner" id="spinner">
+    <i class="fas fa-spinner fa-spin"></i> Cargando...
+</div>
+
+<div class="movie-container" id="movieContainer">
+    <!-- Las películas se agregarán aquí -->
+</div>
+<div class="no-results" id="noResults" style="display: none;">No se encontraron películas.</div>
+<button id="loadMore" style="display: none;">Cargar más</button>
+
+<script>
+    const movieContainer = document.getElementById("movieContainer");
+    const searchInput = document.getElementById("searchInput");
+    const spinner = document.getElementById("spinner");
+    const noResults = document.getElementById("noResults");
+    const loadMoreButton = document.getElementById("loadMore");
+
+    let movies = [
+        { title: "Dragon Ball Super: Super Hero", url: "https://www.example.com/inception", image: "https://es.web.img3.acsta.net/pictures/22/07/06/14/16/5147637.jpg" },
+        { title: "Venom 3: EL Ultimo Baile", url: "https://gineshm.github.io/cinelattv.github.io/VENOM_3_EL_ULTIMO_BAILE.html", image: "https://s1.ppllstatics.com/diariosur/www/multimedia/2024/10/25/pelicula-fotograma-3938-mini.jpg" },
+        { title: "Los 7 Pecados Capitales: Película 2018", url: "https://gineshm.github.io/cinelattv.github.io/LOS_7_PECADOS_PELICULA_2018.html", image: "https://www.lavanguardia.com/peliculas-series/images/movie/poster/2018/8/w1280/b53udDM3OefpABNIOv32XlFjMGG.jpg" },
+        { title: "Mi Villano Favorito 4: GRU4", url: "https://www.example.com/thematrix", image: "https://www.universalpictures.es/tl_files/content/movies/despicable_me_4/posters/02.jpg" },
+        { title: "Jujutsu Kaisen: Película", url: "https://www.example.com/avatar", image: "https://es.web.img3.acsta.net/pictures/22/05/18/16/23/5993750.jpg" },
+        { title: "Kung Fu Panda 4", url: "https://gineshm.github.io/cinelattv.github.io/KUNG_FU_PANDA_4.html", image: "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSrakPTsqdEOxYzMjxiAu2V8Lb_MV8luTzwiGTuyhzcnUdL5m5Pn8P0QUvDsOqSol-i27-eSg" },
+        { title: "Dragon Ball: La Batalla De Los Dioses", url: "https://www.example.com/shawshank", image: "https://es.web.img3.acsta.net/pictures/14/03/13/09/32/445665.jpg" },
+        { title: "Demon Slayer: Tren Infinito", url: "https://gineshm.github.io/cinelattv.github.io/DEMON_SLAYER_T4.html", image: "https://i.ibb.co/prjKHF5/Kimetsu-no-Yaiba-Season-tren-infinito.webp" },
+        { title: "Deja El Mundo Atrás", url: "https://cinelat.github.io/deja_el_mundo_atras.html", image: "https://es.web.img2.acsta.net/pictures/23/10/24/23/54/2364476.jpg" },
+        { title: "Blue Lock: Película", url: "https://gineshm.github.io/cinelattv.github.io/BLUE_LOCK_EPISODE_NIGA_PELICULA.html", image: "https://es.web.img2.acsta.net/img/c9/bb/c9bbf815e0f2b6ece43c5ce235d5ef37.jpg" },
+        { title: "Dragon Ball: Daima", url: "https://cinelat.github.io/daima.html", image: "https://en.dragon-ball-official.com/dragonball/en/news/2024/09/n240904000-02en.jpg" },
+    ];
+
+    let currentPage = 0;
+    const moviesPerPage = 9; // Mostrar 9 películas por página
+
+    window.onload = function() {
+        // Simular la adición de una nueva película cada vez que se carga la página
+        simulateNewMovie();
+        loadMovies();
+        searchInput.addEventListener('input', filterMovies);
+        loadMoreButton.addEventListener('click', loadMoreMovies);
+    };
+
+    function simulateNewMovie() {
+        // Aquí puedes agregar la lógica para simular la adición de una nueva película
+        const newMovie = { title: "DEMON SLAYER T4", url: "https://gineshm.github.io/cinelattv.github.io/DEMON_SLAYER_T4.html", image: "https://bovedainformativa.com.mx/wp-content/uploads/2024/05/K2PVKZAZ6FBH3OGKB7UOOSICXA.jpeg" };
+        movies.unshift(newMovie); // Agregar al inicio de la lista
+    }
+
+    function loadMovies() {
+        showSpinner();
+        const start = currentPage * moviesPerPage;
+        const end = start + moviesPerPage;
+        const moviesToShow = movies.slice(start, end);
+
+        movieContainer.innerHTML = ""; // Limpiar el contenedor antes de cargar
+
+        if (moviesToShow.length === 0) {
+            noResults.style.display = "block";
+        } else {
+            noResults.style.display = "none";
+            moviesToShow.forEach((movie) => {
+                addMovieToContainer(movie.title, movie.url, movie.image);
+            });
+            currentPage++;
+            if (currentPage * moviesPerPage < movies.length) {
+                loadMoreButton.style.display = "block";
+            } else {
+                loadMoreButton.style.display = "none";
+            }
+        }
+        hideSpinner();
+    }
+
+    function loadMoreMovies() {
+        loadMovies();
+    }
+
+    function addMovieToContainer(title, url, image) {
+        const movieDiv = document.createElement("div");
+        movieDiv.classList.add("movie");
+        movieDiv.innerHTML = `
+            <a href="${url}" target="_blank">
+                <img src="${image}" alt="${title}">
+            </a>
+            <p>${title}</p>
+        `;
+        movieContainer.insertBefore(movieDiv, movieContainer.firstChild); // Insertar al inicio
+        setTimeout(() => {
+            movieDiv.classList.add("show");
+        }, 10);
+    }
+
+    function filterMovies() {
+        const query = searchInput.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[.,;:!?]/g, "");
+        movieContainer.innerHTML = "";
+        currentPage = 0; // Reiniciar la página actual
+        noResults.style.display = "none";
+
+        const filteredMovies = movies.filter(movie => movie.title.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[.,;:!?]/g, "").includes(query));
+
+        if (filteredMovies.length === 0) {
+            noResults.style.display = "block";
+        } else {
+            filteredMovies.forEach((movie) => {
+                addMovieToContainer(movie.title, movie.url, movie.image);
+            });
+        }
+    }
+
+    function showSpinner() {
+        spinner.style.display = "block";
+    }
+
+    function hideSpinner() {
+        spinner.style.display = "none";
+    }
+</script>
+
+</body>
+</html>
