@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ZUKIFLIX · Chat IA</title>
+
+  <!-- Firebase v10 -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js"></script>
+
+  <!-- Lucide Icons (CDN) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root {
+      --morado:#8a2be2;
+      --bg:#0f0f10;
+      --panel:#1a1a1d;
+      --text:#f6f6f7;
+      --muted:#9aa0a6;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; background:var(--bg); color:var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+    header{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:16px 20px; background:#111;
+      position:sticky; top:0; z-index:10;
+    }
+    .brand{font-weight:800; font-size:1.2rem}
+    .brand .k{color:var(--morado)}
+    .container{max-width:960px; margin:0 auto; padding:24px 16px 64px}
+    .card{
+      background:var(--panel); border:1px solid #27272a; border-radius:16px; padding:20px;
+      box-shadow:0 10px 30px rgba(0,0,0,.25)
+    }
+    input, textarea, button{
+      width:100%; padding:12px 14px; margin-top:10px;
+      border-radius:10px; border:1px solid #2e2e33;
+      background:#121215; color:var(--text);
+    }
+    textarea{min-height:120px; resize:vertical}
+    button{
+      background:var(--morado); border:none; font-weight:700; cursor:pointer;
+      transition:transform .05s ease, opacity .2s ease;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+    }
+    button svg{width:18px; height:18px}
+    .muted{color:var(--muted); font-size:.9rem}
+    .divider{display:flex; align-items:center; gap:12px; margin:14px 0}
+    .divider span{height:1px; background:#2a2a2f; flex:1}
+    .googleBtn{
+      background:#ffffff; color:#111; border:1px solid #e3e3e8;
+    }
+    .hidden{display:none !important}
+    .resp{
+      white-space:pre-wrap; background:#131315;
+      border:1px solid #2a2a2f; padding:14px; border-radius:12px; margin-top:14px
+    }
+    .topbar{
+      display:flex; gap:8px; align-items:center; justify-content:space-between; margin-bottom:16px
+    }
+    .chip{
+      font-size:.85rem; padding:6px 12px; border-radius:999px;
+      border:1px solid #2e2e33; background:#131315
+    }
+    .logout{
+      background:#2b2b31; color:white;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">ZUKI<span class="k">FLIX</span> · IA</div>
+    <div id="userChip" class="chip hidden"></div>
+  </header>
+
+  <div class="container">
+    <!-- Auth -->
+    <section id="authCard" class="card">
+      <h2>Bienvenido</h2>
+      <p class="muted">Inicia sesión con Google o correo y contraseña.</p>
+
+      <button id="googleBtn" class="googleBtn">
+        <i data-lucide="google"></i> Continuar con Google
+      </button>
+
+      <div class="divider"><span></span><div class="muted">o</div><span></span></div>
+
+      <input type="email" id="email" placeholder="Correo electrónico">
+      <input type="password" id="password" placeholder="Contraseña">
+      <button id="emailLoginBtn"><i data-lucide="log-in"></i> Iniciar sesión</button>
+      <button id="emailSignupBtn"><i data-lucide="user-plus"></i> Crear cuenta</button>
+    </section>
+
+    <!-- Chat -->
+    <section id="chatCard" class="card hidden">
+      <div class="topbar">
+        <div id="greeting" class="muted"></div>
+        <button id="logoutBtn" class="logout"><i data-lucide="log-out"></i> Cerrar sesión</button>
+      </div>
+      <h2>Chat con IA</h2>
+      <textarea id="prompt" placeholder="Escribe tu pregunta..."></textarea>
+      <button id="askBtn"><i data-lucide="bot-message-square"></i> Preguntar a la IA</button>
+      <div id="answer" class="resp"></div>
+    </section>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect,
+      createUserWithEmailAndPassword, signInWithEmailAndPassword,
+      onAuthStateChanged, signOut, setPersistence, browserLocalPersistence
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
+
+    // Inicializar Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBytnjuanP1qnPnF-DMFbpwiSohyMCmG_s",
+      authDomain: "chatflixpe.firebaseapp.com",
+      projectId: "chatflixpe",
+      storageBucket: "chatflixpe.appspot.com",
+      messagingSenderId: "521464275482",
+      appId: "1:521464275482:web:e628a82eabbbb25d2fa7a3",
+      measurementId: "G-SRRFJP5EQW"
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const functions = getFunctions(app);
+    await setPersistence(auth, browserLocalPersistence);
+
+    // Referencias UI
+    const authCard = document.getElementById("authCard");
+    const chatCard = document.getElementById("chatCard");
+    const emailEl = document.getElementById("email");
+    const passEl = document.getElementById("password");
+    const askBtn = document.getElementById("askBtn");
+    const promptEl = document.getElementById("prompt");
+    const answerEl = document.getElementById("answer");
+    const googleBtn = document.getElementById("googleBtn");
+    const emailLogin = document.getElementById("emailLoginBtn");
+    const emailSignup = document.getElementById("emailSignupBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const userChip = document.getElementById("userChip");
+    const greeting = document.getElementById("greeting");
+
+    // Estado de usuario
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const name = user.displayName || user.email;
+        authCard.classList.add("hidden");
+        chatCard.classList.remove("hidden");
+        userChip.textContent = name;
+        userChip.classList.remove("hidden");
+        greeting.textContent = "Hola, " + name;
+      } else {
+        authCard.classList.remove("hidden");
+        chatCard.classList.add("hidden");
+        userChip.classList.add("hidden");
+      }
+    });
+
+    // Google login
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: "select_account" });
+
+    googleBtn.addEventListener("click", async () => {
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (e) {
+        alert("Error con Google: " + e.message);
+      }
+    });
+
+    // Email login
+    emailLogin.addEventListener("click", async () => {
+      try {
+        await signInWithEmailAndPassword(auth, emailEl.value.trim(), passEl.value);
+      } catch (e) {
+        alert("Error al iniciar sesión: " + e.message);
+      }
+    });
+
+    // Email signup
+    emailSignup.addEventListener("click", async () => {
+      try {
+        await createUserWithEmailAndPassword(auth, emailEl.value.trim(), passEl.value);
+        alert("Cuenta creada.");
+      } catch (e) {
+        alert("Error al registrarte: " + e.message);
+      }
+    });
+
+    // Logout
+    logoutBtn.addEventListener("click", async () => {
+      await signOut(auth);
+    });
+
+    // Chat IA
+    askBtn.addEventListener("click", async () => {
+      const texto = promptEl.value.trim();
+      if (!texto) return (answerEl.textContent = "⚠️ Escribe una pregunta.");
+      answerEl.textContent = "⏳ Pensando...";
+      try {
+        const preguntarIA = httpsCallable(functions, "preguntarIA");
+        const result = await preguntarIA({ texto });
+        const respuesta = result?.data?.respuesta ?? "(Sin respuesta)";
+        answerEl.textContent = "🤖 " + respuesta;
+
+        const user = auth.currentUser;
+        if (user) {
+          await addDoc(collection(db, "historial"), {
+            uid: user.uid,
+            pregunta: texto,
+            respuesta,
+            fecha: serverTimestamp()
+          });
+        }
+      } catch (e) {
+        answerEl.textContent = "❌ Error: " + (e.message || e.code);
+      }
+    });
+
+    // Cargar íconos
+    lucide.createIcons();
+  </script>
+</body>
+</html>
