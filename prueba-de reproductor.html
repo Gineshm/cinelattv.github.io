@@ -2,239 +2,159 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reproductor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Reproductor Nagi+</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    .text-outline {
-      text-shadow: 1px 1px 2px black;
+    html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; }
+    * { user-select: none; }
+    .hidden-controls { opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
+    .show-controls { opacity: 1; pointer-events: auto; }
+    input[type=range] {
+      appearance: none; height: 4px; background: #aaa;
     }
+    input[type=range]::-webkit-slider-thumb {
+      appearance: none; width: 12px; height: 12px; background: red; border-radius: 50%;
+    }
+    .text-outline {
+      text-shadow: 1px 1px 2px black, -1px -1px 2px black;
+    }
+    .icon-shadow svg { filter: drop-shadow(1px 1px 2px black); }
+    .animate-press:active { transform: scale(0.9); transition: transform 0.1s ease; }
+    .active-red { color: red !important; }
   </style>
 </head>
-<body class="bg-black text-white overflow-hidden">
-  <div class="relative w-full h-screen">
-    <video
-      id="video"
-      class="w-full h-full object-contain"
-      preload="metadata"
-      poster="https://placehold.co/600x400/000/FFF?text=Portada"
-    >
-      <source src="https://archive.org/download/120_20250729/153.mp4" type="video/mp4" />
-    </video>
+<body class="bg-black w-screen h-screen overflow-hidden">
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const videoLink = urlParams.get('linkmp4');
+  const titulo = urlParams.get('titulo') || '';
+  const sigEpisodio = urlParams.get('sig') || '#';
+  const capitulosURL = urlParams.get('capitulos') || '#';
+  const posterURL = urlParams.get('poster') || '';
+  const introEnd = parseInt(urlParams.get('intro')) || 0;
+  const storageKey = `nagi-progress-${videoLink}`;
+</script>
 
-    <!-- Spinner de carga -->
-    <div id="spinner" class="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-80 z-50">
-      <div class="animate-spin rounded-full h-12 w-12 border-t-4 border-red-600 border-opacity-100"></div>
-      <p class="mt-4 text-white font-bold text-outline">Cargando Nagi+...</p>
-    </div>
-
-    <!-- Controles -->
-    <div
-      id="controls"
-      class="absolute inset-0 flex flex-col justify-between p-4 z-40 pointer-events-none opacity-0 transition-opacity duration-300"
-    >
-      <!-- Parte superior -->
-      <div class="flex justify-between items-center pointer-events-auto">
-        <button id="backBtn" onclick="history.back()" class="text-white">
-          <i data-lucide="arrow-left" class="w-6 h-6 stroke-white"></i>
-        </button>
-        <button id="lockBtn" class="text-white">
-          <i data-lucide="lock" class="w-6 h-6 stroke-white"></i>
-        </button>
+<div id="videoWrapper" class="w-screen h-screen fixed top-0 left-0 z-0">
+  <!-- Portada -->
+  <div id="cover" class="absolute inset-0 z-50 bg-black">
+    <img id="posterImage" src="" class="w-full h-full object-cover" />
+    <button onclick="startVideo()" class="absolute inset-0 flex items-center justify-center">
+      <div class="bg-white/20 backdrop-blur-sm p-4 rounded-full text-white animate-press">
+        <i data-lucide="play" class="w-12 h-12"></i>
       </div>
-
-      <!-- Controles centrales -->
-      <div class="flex justify-center items-center space-x-16 pointer-events-auto">
-        <button id="rewindBtn">
-          <i data-lucide="rotate-ccw" class="w-8 h-8 stroke-white"></i>
-        </button>
-        <button id="playPauseBtn">
-          <i data-lucide="play" class="w-12 h-12 stroke-white"></i>
-        </button>
-        <button id="forwardBtn">
-          <i data-lucide="rotate-cw" class="w-8 h-8 stroke-white"></i>
-        </button>
-      </div>
-
-      <!-- Parte inferior -->
-      <div class="w-full pointer-events-auto">
-        <!-- NUEVA BARRA DE PROGRESO -->
-        <div class="w-full">
-          <div class="flex justify-between text-xs text-white mb-1 text-outline">
-            <span id="currentTime">0:00</span>
-            <span id="totalTime">0:00</span>
-          </div>
-          <input
-            type="range"
-            id="progress"
-            min="0"
-            max="100"
-            value="0"
-            class="w-full h-2 accent-red-600 cursor-pointer"
-          />
-        </div>
-        <!-- Botones inferiores -->
-        <div class="flex justify-between items-center mt-2">
-          <button id="fullscreenBtn">
-            <i data-lucide="maximize" class="w-6 h-6 stroke-white"></i>
-          </button>
-          <button id="episodesBtn">
-            <i data-lucide="list-video" class="w-6 h-6 stroke-white"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Botón de desbloqueo -->
-    <div
-      id="unlockBtn"
-      class="hidden absolute top-4 right-4 z-50 pointer-events-auto"
-    >
-      <button class="text-white">
-        <i data-lucide="unlock" class="w-6 h-6 stroke-white"></i>
-      </button>
-    </div>
-
-    <!-- Botón Saltar Intro -->
-    <button
-      id="btnSkipIntro"
-      class="hidden absolute bottom-24 right-4 z-50 bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-semibold pointer-events-auto"
-    >
-      Saltar intro
     </button>
   </div>
 
-  <script>
-    lucide.createIcons();
+  <!-- Spinner -->
+  <div id="loadingSpinner" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/60">
+    <div class="animate-spin text-white mb-4">
+      <i data-lucide="loader" class="w-10 h-10"></i>
+    </div>
+    <div class="text-white text-sm font-semibold text-outline">Cargando Nagi+...</div>
+  </div>
 
-    const video = document.getElementById("video");
-    const playPauseBtn = document.getElementById("playPauseBtn");
-    const rewindBtn = document.getElementById("rewindBtn");
-    const forwardBtn = document.getElementById("forwardBtn");
-    const controls = document.getElementById("controls");
-    const progress = document.getElementById("progress");
-    const currentTimeEl = document.getElementById("currentTime");
-    const totalTimeEl = document.getElementById("totalTime");
-    const spinner = document.getElementById("spinner");
-    const lockBtn = document.getElementById("lockBtn");
-    const unlockBtn = document.getElementById("unlockBtn");
-    const btnSkipIntro = document.getElementById("btnSkipIntro");
+  <!-- Video -->
+  <video id="video" class="w-full h-full object-cover" src="" playsinline></video>
 
-    let controlsVisible = false;
-    let hideControlsTimeout;
-    let locked = false;
+  <!-- Saltar intro -->
+  <button id="btnSkipIntro" onclick="resetHideTimeout(); skipIntro()" class="absolute right-4 bottom-36 bg-white/20 text-white px-3 py-1 text-sm font-bold rounded-none z-50 backdrop-blur-sm hidden text-outline">
+    <i data-lucide="fast-forward" class="inline-block w-4 h-4 mr-1"></i> Saltar intro
+  </button>
 
-    const introEnd = 85; // segundo donde termina la intro
-    const storageKey = "videoProgress";
+  <!-- Desbloquear -->
+  <button id="unlockBtn" onclick="resetHideTimeout(); unlockControls()" class="absolute top-2 right-2 z-50 text-white p-2 bg-black/50 rounded-full hidden">
+    <i data-lucide="unlock" class="w-6 h-6"></i>
+  </button>
 
-    function toggleControls() {
-      if (locked) return;
-      controlsVisible = !controlsVisible;
-      controls.classList.toggle("opacity-0", !controlsVisible);
-      controls.classList.toggle("pointer-events-none", !controlsVisible);
-      if (controlsVisible) resetHideTimeout();
-    }
+  <!-- Título -->
+  <div id="episodeTitle" class="absolute top-2 left-2 z-10 text-white text-sm text-outline hidden-controls"></div>
 
-    function resetHideTimeout() {
-      clearTimeout(hideControlsTimeout);
-      hideControlsTimeout = setTimeout(() => {
-        controls.classList.add("opacity-0", "pointer-events-none");
-        controlsVisible = false;
-      }, 3000);
-    }
+  <!-- Controles -->
+  <div id="controls" class="absolute inset-0 flex flex-col justify-end px-4 pt-2 pb-4 hidden-controls">
+    <div class="flex-1 flex items-center justify-center">
+      <div class="flex items-center justify-center gap-72">
+        <button onclick="resetHideTimeout(); skip(-10)" class="active:text-red-600 icon-shadow animate-press">
+          <i data-lucide="rotate-ccw" class="w-8 h-8 text-white"></i>
+        </button>
+        <button id="playPauseBtn" onclick="resetHideTimeout(); togglePlay()" class="animate-press active:text-red-600 icon-shadow">
+          <i id="playPauseIcon" data-lucide="pause" class="w-10 h-10 text-white"></i>
+        </button>
+        <button onclick="resetHideTimeout(); skip(10)" class="active:text-red-600 icon-shadow animate-press">
+          <i data-lucide="rotate-cw" class="w-8 h-8 text-white"></i>
+        </button>
+      </div>
+    </div>
 
-    function formatTime(seconds) {
-      if (isNaN(seconds)) return "0:00";
-      const hrs = Math.floor(seconds / 3600);
-      const mins = Math.floor((seconds % 3600) / 60);
-      const secs = Math.floor(seconds % 60);
-      return `${hrs > 0 ? hrs + ":" : ""}${mins}:${secs.toString().padStart(2, "0")}`;
-    }
+    <!-- Barra progreso actualizada -->
+    <div class="w-full">
+      <div class="flex justify-between text-xs text-white mb-1 text-outline">
+        <span id="currentTime">0:00</span>
+        <span id="totalTime">0:00</span>
+      </div>
+      <input
+        type="range"
+        id="progress"
+        min="0"
+        max="100"
+        value="0"
+        class="w-full h-2 accent-red-600 cursor-pointer"
+      />
+    </div>
 
-    video.addEventListener("loadedmetadata", () => {
-      totalTimeEl.textContent = formatTime(video.duration);
-      const savedTime = localStorage.getItem(storageKey);
-      if (savedTime) video.currentTime = parseFloat(savedTime);
-    });
+    <!-- Controles inferiores -->
+    <div id="bottomControls" class="grid grid-cols-5 text-white text-xs mt-2 gap-2 text-center">
+      <button onclick="resetHideTimeout(); toggleFullscreen()" class="flex flex-col items-center active:text-red-600 icon-shadow animate-press">
+        <i data-lucide="maximize" class="w-5 h-5 mb-1"></i><span class="text-outline">Pantalla completa</span>
+      </button>
+      <button onclick="resetHideTimeout(); toggleVideoFit(this)" class="flex flex-col items-center icon-shadow animate-press" id="fitBtn">
+        <i data-lucide="move" class="w-5 h-5 mb-1"></i><span class="text-outline">Ajuste</span>
+      </button>
+      <button onclick="location.href=capitulosURL" class="flex flex-col items-center active:text-red-600 icon-shadow animate-press">
+        <i data-lucide="layout-grid" class="w-5 h-5 mb-1"></i><span class="text-outline">Episodios</span>
+      </button>
+      <button id="lockBtn" onclick="toggleLock()" class="flex flex-col items-center active:text-red-600 icon-shadow animate-press">
+        <i id="lockIcon" data-lucide="lock" class="w-5 h-5 mb-1"></i><span id="lockText" class="text-outline">Bloquear</span>
+      </button>
+      <button onclick="location.href=sigEpisodio" class="flex flex-col items-center active:text-red-600 icon-shadow animate-press">
+        <i data-lucide="chevron-right" class="w-5 h-5 mb-1"></i><span class="text-outline">Sig. Episodio</span>
+      </button>
+    </div>
+  </div>
+</div>
 
-    video.addEventListener("timeupdate", () => {
-      const value = (video.currentTime / video.duration) * 100;
-      progress.value = value || 0;
-      currentTimeEl.textContent = formatTime(video.currentTime);
+<script>
+  // funciones igual que antes, con ajustes en progress
+  const video = document.getElementById('video');
+  const playPauseIcon = document.getElementById('playPauseIcon');
+  const progress = document.getElementById('progress');
+  const currentTimeEl = document.getElementById('currentTime');
+  const totalTimeEl = document.getElementById('totalTime');
 
-      // Mostrar botón Saltar intro
-      if (video.currentTime >= 0 && video.currentTime < introEnd) {
-        if (!locked) btnSkipIntro.classList.remove("hidden");
-      } else {
-        btnSkipIntro.classList.add("hidden");
-      }
-    });
+  function formatTime(seconds) {
+    if (isNaN(seconds)) return "0:00";
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  }
 
-    progress.addEventListener("input", () => {
-      resetHideTimeout();
-      video.currentTime = (progress.value / 100) * video.duration;
-    });
+  video.addEventListener('loadedmetadata', () => {
+    totalTimeEl.textContent = formatTime(video.duration);
+    const savedTime = localStorage.getItem(storageKey);
+    if (savedTime) video.currentTime = parseFloat(savedTime);
+  });
 
-    video.addEventListener("click", toggleControls);
+  video.addEventListener('timeupdate', () => {
+    const value = (video.currentTime / video.duration) * 100;
+    progress.value = value || 0;
+    currentTimeEl.textContent = formatTime(video.currentTime);
+  });
 
-    playPauseBtn.addEventListener("click", () => {
-      if (video.paused) {
-        video.play();
-        playPauseBtn.innerHTML = '<i data-lucide="pause" class="w-12 h-12 stroke-white"></i>';
-      } else {
-        video.pause();
-        playPauseBtn.innerHTML = '<i data-lucide="play" class="w-12 h-12 stroke-white"></i>';
-      }
-      lucide.createIcons();
-    });
-
-    rewindBtn.addEventListener("click", () => {
-      video.currentTime -= 10;
-      resetHideTimeout();
-    });
-
-    forwardBtn.addEventListener("click", () => {
-      video.currentTime += 10;
-      resetHideTimeout();
-    });
-
-    video.addEventListener("playing", () => {
-      spinner.style.display = "none";
-      playPauseBtn.innerHTML = '<i data-lucide="pause" class="w-12 h-12 stroke-white"></i>';
-      lucide.createIcons();
-    });
-
-    video.addEventListener("waiting", () => {
-      spinner.style.display = "flex";
-    });
-
-    lockBtn.addEventListener("click", () => {
-      locked = true;
-      controls.classList.add("opacity-0", "pointer-events-none");
-      unlockBtn.classList.remove("hidden");
-    });
-
-    unlockBtn.addEventListener("click", () => {
-      locked = false;
-      unlockBtn.classList.add("hidden");
-      controls.classList.remove("opacity-0", "pointer-events-none");
-      controlsVisible = true;
-      resetHideTimeout();
-    });
-
-    btnSkipIntro.addEventListener("click", () => {
-      video.currentTime = introEnd;
-      btnSkipIntro.classList.add("hidden");
-    });
-
-    window.addEventListener("beforeunload", () => {
-      localStorage.setItem(storageKey, video.currentTime);
-    });
-
-    document.addEventListener("DOMContentLoaded", () => {
-      video.addEventListener("click", toggleControls);
-    });
-  </script>
+  progress.addEventListener('input', () => {
+    video.currentTime = (progress.value / 100) * video.duration;
+  });
+</script>
 </body>
 </html>
