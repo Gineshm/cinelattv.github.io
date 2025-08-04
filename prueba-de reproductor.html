@@ -1,160 +1,101 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reproductor Nagi+</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; }
-    * { user-select: none; }
-    .hidden-controls { opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
-    .show-controls { opacity: 1; pointer-events: auto; }
-    input[type=range] {
-      appearance: none; height: 4px; background: #aaa;
+    #video-container::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      z-index: -1;
+      filter: brightness(0.3);
     }
-    input[type=range]::-webkit-slider-thumb {
-      appearance: none; width: 12px; height: 12px; background: red; border-radius: 50%;
-    }
-    .text-outline {
-      text-shadow: 1px 1px 2px black, -1px -1px 2px black;
-    }
-    .icon-shadow svg { filter: drop-shadow(1px 1px 2px black); }
-    .animate-press:active { transform: scale(0.9); transition: transform 0.1s ease; }
-    .active-red { color: red !important; }
   </style>
 </head>
-<body class="bg-black w-screen h-screen overflow-hidden">
-<script>
-  const urlParams = new URLSearchParams(window.location.search);
-  const videoLink = urlParams.get('linkmp4');
-  const titulo = urlParams.get('titulo') || '';
-  const sigEpisodio = urlParams.get('sig') || '#';
-  const capitulosURL = urlParams.get('capitulos') || '#';
-  const posterURL = urlParams.get('poster') || '';
-  const introEnd = parseInt(urlParams.get('intro')) || 0;
-  const storageKey = `nagi-progress-${videoLink}`;
-</script>
+<body class="bg-black text-white m-0 p-0 overflow-hidden">
 
-<div id="videoWrapper" class="w-screen h-screen fixed top-0 left-0 z-0">
-  <!-- Portada -->
-  <div id="cover" class="absolute inset-0 z-50 bg-black">
-    <img id="posterImage" src="" class="w-full h-full object-cover" />
-    <button onclick="startVideo()" class="absolute inset-0 flex items-center justify-center">
-      <div class="bg-white/20 backdrop-blur-sm p-4 rounded-full text-white animate-press">
-        <i data-lucide="play" class="w-12 h-12"></i>
+  <div id="video-container" class="relative w-screen h-screen flex items-center justify-center">
+    <video id="videoPlayer" class="w-full h-full" preload="metadata" poster=""></video>
+
+    <!-- Controles -->
+    <div id="controls" class="absolute bottom-0 w-full p-4 bg-gradient-to-t from-black/80 to-transparent">
+      <div class="flex items-center gap-4 mb-2">
+        <span id="currentTime" class="text-sm">0:00</span>
+        <input id="progressBar" type="range" min="0" max="100" value="0" class="w-full h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer accent-red-600">
+        <span id="duration" class="text-sm">0:00</span>
       </div>
-    </button>
-  </div>
-
-  <!-- Spinner -->
-  <div id="loadingSpinner" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/60">
-    <div class="animate-spin text-white mb-4">
-      <i data-lucide="loader" class="w-10 h-10"></i>
-    </div>
-    <div class="text-white text-sm font-semibold text-outline">Cargando Nagi+...</div>
-  </div>
-
-  <!-- Video -->
-  <video id="video" class="w-full h-full object-cover" src="" playsinline></video>
-
-  <!-- Saltar intro -->
-  <button id="btnSkipIntro" onclick="resetHideTimeout(); skipIntro()" class="absolute right-4 bottom-36 bg-white/20 text-white px-3 py-1 text-sm font-bold rounded-none z-50 backdrop-blur-sm hidden text-outline">
-    <i data-lucide="fast-forward" class="inline-block w-4 h-4 mr-1"></i> Saltar intro
-  </button>
-
-  <!-- Desbloquear -->
-  <button id="unlockBtn" onclick="resetHideTimeout(); unlockControls()" class="absolute top-2 right-2 z-50 text-white p-2 bg-black/50 rounded-full hidden">
-    <i data-lucide="unlock" class="w-6 h-6"></i>
-  </button>
-
-  <!-- Título -->
-  <div id="episodeTitle" class="absolute top-2 left-2 z-10 text-white text-sm text-outline hidden-controls"></div>
-
-  <!-- Controles -->
-  <div id="controls" class="absolute inset-0 flex flex-col justify-end px-4 pt-2 pb-4 hidden-controls">
-    <div class="flex-1 flex items-center justify-center">
-      <div class="flex items-center justify-center gap-72">
-        <button onclick="resetHideTimeout(); skip(-10)" class="active:text-red-600 icon-shadow animate-press">
-          <i data-lucide="rotate-ccw" class="w-8 h-8 text-white"></i>
-        </button>
-        <button id="playPauseBtn" onclick="resetHideTimeout(); togglePlay()" class="animate-press active:text-red-600 icon-shadow">
-          <i id="playPauseIcon" data-lucide="pause" class="w-10 h-10 text-white"></i>
-        </button>
-        <button onclick="resetHideTimeout(); skip(10)" class="active:text-red-600 icon-shadow animate-press">
-          <i data-lucide="rotate-cw" class="w-8 h-8 text-white"></i>
-        </button>
+      <div class="flex justify-center items-center gap-10">
+        <button onclick="skip(-10)" class="text-white"><i data-lucide="rotate-ccw"></i></button>
+        <button onclick="togglePlay()" class="text-white"><i id="playPauseIcon" data-lucide="play"></i></button>
+        <button onclick="skip(10)" class="text-white"><i data-lucide="rotate-cw"></i></button>
       </div>
     </div>
-
-    <!-- Barra progreso actualizada -->
-    <div class="w-full">
-      <div class="flex justify-between text-xs text-white mb-1 text-outline">
-        <span id="currentTime">0:00</span>
-        <span id="totalTime">0:00</span>
-      </div>
-      <input
-        type="range"
-        id="progress"
-        min="0"
-        max="100"
-        value="0"
-        class="w-full h-2 accent-red-600 cursor-pointer"
-      />
-    </div>
-
-    <!-- Controles inferiores -->
-    <div id="bottomControls" class="grid grid-cols-5 text-white text-xs mt-2 gap-2 text-center">
-      <button onclick="resetHideTimeout(); toggleFullscreen()" class="flex flex-col items-center active:text-red-600 icon-shadow animate-press">
-        <i data-lucide="maximize" class="w-5 h-5 mb-1"></i><span class="text-outline">Pantalla completa</span>
-      </button>
-      <button onclick="resetHideTimeout(); toggleVideoFit(this)" class="flex flex-col items-center icon-shadow animate-press" id="fitBtn">
-        <i data-lucide="move" class="w-5 h-5 mb-1"></i><span class="text-outline">Ajuste</span>
-      </button>
-      <button onclick="location.href=capitulosURL" class="flex flex-col items-center active:text-red-600 icon-shadow animate-press">
-        <i data-lucide="layout-grid" class="w-5 h-5 mb-1"></i><span class="text-outline">Episodios</span>
-      </button>
-      <button id="lockBtn" onclick="toggleLock()" class="flex flex-col items-center active:text-red-600 icon-shadow animate-press">
-        <i id="lockIcon" data-lucide="lock" class="w-5 h-5 mb-1"></i><span id="lockText" class="text-outline">Bloquear</span>
-      </button>
-      <button onclick="location.href=sigEpisodio" class="flex flex-col items-center active:text-red-600 icon-shadow animate-press">
-        <i data-lucide="chevron-right" class="w-5 h-5 mb-1"></i><span class="text-outline">Sig. Episodio</span>
-      </button>
-    </div>
   </div>
-</div>
 
-<script>
-  // funciones igual que antes, con ajustes en progress
-  const video = document.getElementById('video');
-  const playPauseIcon = document.getElementById('playPauseIcon');
-  const progress = document.getElementById('progress');
-  const currentTimeEl = document.getElementById('currentTime');
-  const totalTimeEl = document.getElementById('totalTime');
+  <script>
+    lucide.createIcons();
 
-  function formatTime(seconds) {
-    if (isNaN(seconds)) return "0:00";
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
-  }
+    const video = document.getElementById('videoPlayer');
+    const progressBar = document.getElementById('progressBar');
+    const currentTimeDisplay = document.getElementById('currentTime');
+    const durationDisplay = document.getElementById('duration');
+    const playPauseIcon = document.getElementById('playPauseIcon');
+    const videoContainer = document.getElementById('video-container');
 
-  video.addEventListener('loadedmetadata', () => {
-    totalTimeEl.textContent = formatTime(video.duration);
-    const savedTime = localStorage.getItem(storageKey);
-    if (savedTime) video.currentTime = parseFloat(savedTime);
-  });
+    const urlParams = new URLSearchParams(window.location.search);
+    const videoUrl = urlParams.get('linkmp4');
+    const posterUrl = urlParams.get('poster');
+    const introTime = parseInt(urlParams.get('intro')) || 0;
 
-  video.addEventListener('timeupdate', () => {
-    const value = (video.currentTime / video.duration) * 100;
-    progress.value = value || 0;
-    currentTimeEl.textContent = formatTime(video.currentTime);
-  });
+    video.src = videoUrl;
+    video.poster = posterUrl;
+    videoContainer.style.setProperty('--poster', `url(${posterUrl})`);
+    videoContainer.style.backgroundImage = `url('${posterUrl}')`;
 
-  progress.addEventListener('input', () => {
-    video.currentTime = (progress.value / 100) * video.duration;
-  });
-</script>
+    function formatTime(time) {
+      const minutes = Math.floor(time / 60);
+      const seconds = Math.floor(time % 60);
+      return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }
+
+    video.addEventListener('loadedmetadata', () => {
+      progressBar.max = Math.floor(video.duration);
+      durationDisplay.textContent = formatTime(video.duration);
+    });
+
+    video.addEventListener('timeupdate', () => {
+      progressBar.value = Math.floor(video.currentTime);
+      currentTimeDisplay.textContent = formatTime(video.currentTime);
+    });
+
+    progressBar.addEventListener('input', () => {
+      video.currentTime = progressBar.value;
+    });
+
+    function togglePlay() {
+      if (video.paused) {
+        video.play();
+        playPauseIcon.setAttribute("data-lucide", "pause");
+      } else {
+        video.pause();
+        playPauseIcon.setAttribute("data-lucide", "play");
+      }
+      lucide.createIcons();
+    }
+
+    function skip(seconds) {
+      video.currentTime += seconds;
+    }
+  </script>
 </body>
 </html>
